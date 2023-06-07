@@ -7,6 +7,7 @@ import me.anjoismysign.anjo.libraries.PanelLib;
 import me.anjoismysign.anjo.swing.AnjoPane;
 import me.anjoismysign.anjo.swing.OptionType;
 import me.anjoismysign.anjo.swing.components.AnjoTextField;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,6 +24,10 @@ public class MongoParser {
                         "or avoid it, such as lowering volume. \n\n" +
                         "-anjoismysignature");
         Player player = moondream();
+        loop(player);
+    }
+
+    private static void loop(Player player){
         try {
             AnjoPane parser = AnjoPane.build("MongoParser", OptionType.OK,
                     new ImageIcon(MongoParser.class.getResource("/artwork.png"))
@@ -33,6 +38,10 @@ public class MongoParser {
                 return;
             }
             String connection = parser.getTextFieldText(0);
+            if (connection.isEmpty()) {
+                loop(player);
+                return;
+            }
             MongoClientURI uri = new MongoClientURI(connection);
 
             String host = uri.getHosts().get(0);
@@ -98,6 +107,7 @@ public class MongoParser {
         clipboard.setContents(selection, null);
     }
 
+    @NotNull
     private static Player moondream(){
         try {
         InputStream fileInputStream = MongoParser.class.getResourceAsStream("/Moondream.mp3");
@@ -111,8 +121,7 @@ public class MongoParser {
             }).start();
         return player;
         } catch (JavaLayerException e) {
-        e.printStackTrace();
+        throw new RuntimeException("Exception", e);
         }
-        return null;
     }
 }
